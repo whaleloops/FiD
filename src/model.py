@@ -48,6 +48,7 @@ class FiDT5(transformers.T5ForConditionalGeneration):
     # We need to resize the inputs here, as the generate method expect 2D tensors
     def generate(self, input_ids, attention_mask, max_length):
         self.encoder.n_passages = input_ids.size(1)
+        # encoder_outputs = self.encoder(input_ids.view(input_ids.size(0), -1), attention_mask=attention_mask)
         return super().generate(
             input_ids=input_ids.view(input_ids.size(0), -1),
             attention_mask=attention_mask.view(attention_mask.size(0), -1),
@@ -143,7 +144,17 @@ class EncoderWrapper(torch.nn.Module):
         input_ids = input_ids.view(bsz*self.n_passages, passage_length)
         attention_mask = attention_mask.view(bsz*self.n_passages, passage_length)
         outputs = self.encoder(input_ids, attention_mask, **kwargs)
-        outputs = (outputs[0].view(bsz, self.n_passages*passage_length, -1), ) + outputs[1:]
+        # outputs = (outputs[0].view(bsz, self.n_passages*passage_length, -1), ) + outputs[1:]
+        outputs.last_hidden_state = outputs.last_hidden_state.view(bsz, self.n_passages*passage_length, -1)
+
+        # BaseModelOutputWithPastAndCrossAttentions(
+        #     last_hidden_state=hidden_states,
+        #     past_key_values=present_key_value_states,
+        #     hidden_states=all_hidden_states,
+        #     attentions=all_attentions,
+        #     cross_attentions=all_cross_attentions,
+        # )
+
         return outputs
 
 class CheckpointWrapper(torch.nn.Module):

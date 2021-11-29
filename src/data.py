@@ -76,10 +76,17 @@ def encode_passages(batch_text_passages, tokenizer, max_length):
         p = tokenizer.batch_encode_plus(
             text_passages,
             max_length=max_length,
-            pad_to_max_length=True,
+            padding='max_length',
             return_tensors='pt',
             truncation=True
         )
+        # p = tokenizer.batch_encode_plus(
+        #     text_passages,
+        #     max_length=max_length,
+        #     pad_to_max_length=True,
+        #     return_tensors='pt',
+        #     truncation=True
+        # )
         passage_ids.append(p['input_ids'][None])
         passage_masks.append(p['attention_mask'][None])
 
@@ -100,10 +107,17 @@ class Collator(object):
         target = self.tokenizer.batch_encode_plus(
             target,
             max_length=self.answer_maxlength if self.answer_maxlength > 0 else None,
-            pad_to_max_length=True,
+            padding='max_length',
             return_tensors='pt',
             truncation=True if self.answer_maxlength > 0 else False,
         )
+        # target = self.tokenizer.batch_encode_plus(
+        #     target,
+        #     max_length=self.answer_maxlength if self.answer_maxlength > 0 else None,
+        #     pad_to_max_length=True,
+        #     return_tensors='pt',
+        #     truncation=True if self.answer_maxlength > 0 else False,
+        # )
         target_ids = target["input_ids"]
         target_mask = target["attention_mask"].bool()
         target_ids = target_ids.masked_fill(~target_mask, -100)
@@ -156,11 +170,18 @@ class RetrieverCollator(object):
         question = [ex['question'] for ex in batch]
         question = self.tokenizer.batch_encode_plus(
             question,
-            pad_to_max_length=True,
+            padding='max_length',
             return_tensors="pt",
             max_length=self.question_maxlength,
             truncation=True
         )
+        # question = self.tokenizer.batch_encode_plus(
+        #     question,
+        #     pad_to_max_length=True,
+        #     return_tensors="pt",
+        #     max_length=self.question_maxlength,
+        #     truncation=True
+        # )
         question_ids = question['input_ids']
         question_mask = question['attention_mask'].bool()
 
@@ -206,11 +227,18 @@ class TextCollator(object):
         index = [x[0] for x in batch]
         encoded_batch = self.tokenizer.batch_encode_plus(
             [x[1] for x in batch],
-            pad_to_max_length=True,
+            padding='max_length',
             return_tensors="pt",
             max_length=self.maxlength,
             truncation=True
         )
+        # encoded_batch = self.tokenizer.batch_encode_plus(
+        #     [x[1] for x in batch],
+        #     pad_to_max_length=True,
+        #     return_tensors="pt",
+        #     max_length=self.maxlength,
+        #     truncation=True
+        # )
         text_ids = encoded_batch['input_ids']
         text_mask = encoded_batch['attention_mask'].bool()
 

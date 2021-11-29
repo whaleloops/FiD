@@ -19,6 +19,10 @@ import src.data
 import src.evaluation
 import src.model
 
+# import warnings
+# warnings.filterwarnings("ignore")
+
+
 def evaluate(model, dataset, dataloader, tokenizer, opt):
     loss, curr_loss = 0.0, 0.0
     model.eval()
@@ -107,6 +111,7 @@ if __name__ == "__main__":
         global_rank=opt.global_rank, #use the global rank and world size attibutes to split the eval set on multiple gpus
         world_size=opt.world_size
     )
+    # eval_examples = eval_examples[:400]
     eval_dataset = src.data.Dataset(
         eval_examples, 
         opt.n_context, 
