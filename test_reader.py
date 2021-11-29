@@ -95,7 +95,7 @@ if __name__ == "__main__":
     directory_exists = dir_path.exists()
     if opt.is_distributed:
         torch.distributed.barrier()
-    dir_path.mkdir(parents=True, exist_ok=True)
+    dir_path.mkdir(parents=True, exist_ok=True) 
     if opt.write_results:
         (dir_path / 'test_results').mkdir(parents=True, exist_ok=True)
     logger = src.util.init_logger(opt.is_main, opt.is_distributed, Path(opt.checkpoint_dir) / opt.name / 'run.log')

@@ -109,7 +109,7 @@ class Collator(object):
             max_length=self.answer_maxlength if self.answer_maxlength > 0 else None,
             padding='max_length',
             return_tensors='pt',
-            truncation=True if self.answer_maxlength > 0 else False,
+            truncation=True if self.answer_maxlength > 0 else False, 
         )
         # target = self.tokenizer.batch_encode_plus(
         #     target,
