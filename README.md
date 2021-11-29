@@ -1,4 +1,4 @@
-This repository contains code for:
+This repository contains code for [facebook fid](https://github.com/facebookresearch/FiD):
 - Fusion-in-Decoder models
 - Distilling Knowledge from Reader to Retriever
 
@@ -6,113 +6,24 @@ This repository contains code for:
 
 - Python 3
 - [PyTorch](http://pytorch.org/) (currently tested on version 1.6.0)
-- [Transformers](http://huggingface.co/transformers/) (**version 3.0.2**, unlikely to work with a different version)
+- [Transformers](http://huggingface.co/transformers/) (**version 4.8.2**)
 - [NumPy](http://www.numpy.org/)
-
-
-# Data
-
-### Download data
-NaturalQuestions and TriviaQA data can be downloaded using [`get-data.sh`](get-data.sh). Both datasets are obtained from the original source and the wikipedia dump is downloaded from the [DPR](https://github.com/facebookresearch/DPR) repository. In addition to the question and answers, this script retrieves the Wikipedia passages used to trained the released pretrained models.
-
-### Data format
-
-The expected data format is a list of entry examples, where each entry example is a dictionary containing
-- `id`: example id, optional
-- `question`: question text
-- `target`: answer used for model training, if not given, the target is randomly sampled from the 'answers' list
-- `answers`: list of answer text for evaluation, also used for training if target is not given
-- `ctxs`: a list of passages where each item is a dictionary containing
-        - `title`: article title
-        - `text`: passage text
-
-Entry example:
-```
-{
-  'id': '0',
-  'question': 'What element did Marie Curie name after her native land?',
-  'target': 'Polonium',
-  'answers': ['Polonium', 'Po (chemical element)', 'Po'],
-  'ctxs': [
-            {
-                "title": "Marie Curie",
-                "text": "them on visits to Poland. She named the first chemical element that she discovered in 1898 \"polonium\", after her native country. Marie Curie died in 1934, aged 66, at a sanatorium in Sancellemoz (Haute-Savoie), France, of aplastic anemia from exposure to radiation in the course of her scientific research and in the course of her radiological work at field hospitals during World War I. Maria Sk\u0142odowska was born in Warsaw, in Congress Poland in the Russian Empire, on 7 November 1867, the fifth and youngest child of well-known teachers Bronis\u0142awa, \"n\u00e9e\" Boguska, and W\u0142adys\u0142aw Sk\u0142odowski. The elder siblings of Maria"
-            },
-            {
-                "title": "Marie Curie",
-                "text": "was present in such minute quantities that they would eventually have to process tons of the ore. In July 1898, Curie and her husband published a joint paper announcing the existence of an element which they named \"polonium\", in honour of her native Poland, which would for another twenty years remain partitioned among three empires (Russian, Austrian, and Prussian). On 26 December 1898, the Curies announced the existence of a second element, which they named \"radium\", from the Latin word for \"ray\". In the course of their research, they also coined the word \"radioactivity\". To prove their discoveries beyond any"
-            }
-          ]
-}
-```
-
-# Pretrained models.
-
-Pretrained models can be downloaded using [`get-model.sh`](get-model.sh). Currently availble models are [nq_reader_base, nq_reader_large, nq_retriever, tqa_reader_base, tqa_reader_large, tqa_retriever].
-
-```shell
-bash get-model.sh -m model_name
-```
-
-Performance of the pretrained models:
-
-<table>
-  <tr><td>Mode size</td><td colspan="2">NaturalQuestions</td><td colspan="2">TriviaQA</td></tr>
-  <tr><td></td><td>dev</td><td>test</td><td>dev</td><td>test</td></tr>
-  <tr><td>base</td><td>49.2</td><td>50.1</td><td>68.7</td><td>69.3</td></tr>
-  <tr><td>large</td><td>52.7</td><td>54.4</td><td>72.5</td><td>72.5</td></tr>
-</table>
 
 
 
 # I. Fusion-in-Decoder
+Performance of the my pretrained and [origianl pretrained models](https://github.com/facebookresearch/FiD):
 
-Fusion-in-Decoder models can be trained using [`train_reader.py`](train_reader.py) and evaluated with [`test_reader.py`](test_reader.py).
+<table>
+  <tr><td>Mode size</td><td colspan="2">TriviaQA-selftrain10</td><td colspan="2">TriviaQA-original10</td><td colspan="2">TriviaQA-original100</td></tr>
+  <tr><td></td><td>dev</td><td>test</td><td>dev</td><td>test</td></tr><td>dev</td><td>test</td></tr>
+  <tr><td>base</td><td>abc</td><td>abc</td><td>65.20</td><td>65.52</td><td>67.84</td><td>68.10</td></tr>
+</table>
 
-### Train
 
-[`train_reader.py`](train_reader.py) provides the code to train a model. An example usage of the script is given below:
 
-```shell
-python train_reader.py \
-        --train_data train_data.json \
-        --eval_data eval_data.json \
-        --model_size base \
-        --per_gpu_batch_size 1 \
-        --n_context 100 \
-        --name my_experiment \
-        --checkpoint_dir checkpoint \
-```
 
-Training these models with 100 passages is memory intensive. To alleviate this issue we use checkpointing with the `--use_checkpoint` option. Tensors of variable sizes lead to memory overhead. Encoder input tensors have a fixed size by default, but not the decoder input tensors. The tensor size on the decoder side can be fixed using `--answer_maxlength`. The large readers have been trained on 64 GPUs with the following hyperparameters:
-
-```shell
-python train_reader.py \
-        --use_checkpoint \
-        --lr 0.00005 \
-        --optim adamw \
-        --scheduler linear \
-        --weight_decay 0.01 \
-        --text_maxlength 250 \
-        --per_gpu_batch_size 1 \
-        --n_context 100 \
-        --total_step 15000 \
-        --warmup_step 1000 \
-```
-
-### Test
-
-You can evaluate your model or a pretrained model with [`test_reader.py`](test_reader.py). An example usage of the script is provided below.
-
-```shell
-python test_reader.py \
-        --model_path checkpoint_dir/my_experiment/my_model_dir/checkpoint/best_dev \
-        --eval_data eval_data.json \
-        --per_gpu_batch_size 1 \
-        --n_context 100 \
-        --name my_test \
-        --checkpoint_dir checkpoint \
-```
+TODO: delete below
 
 
 

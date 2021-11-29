@@ -4,13 +4,14 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
-import time
+import datetime
 import sys
 import torch
 import transformers
 import numpy as np
 from pathlib import Path
 from torch.utils.data import DataLoader, RandomSampler, DistributedSampler, SequentialSampler
+import importlib.util
 from src.options import Options
 
 import src.slurm
@@ -24,7 +25,8 @@ def train(model, optimizer, scheduler, step, train_dataset, eval_dataset, opt, c
 
     if opt.is_main:
         try:
-            tb_logger = torch.utils.tensorboard.SummaryWriter(Path(opt.checkpoint_dir)/opt.name)
+            from torch.utils.tensorboard import SummaryWriter
+            tb_logger = SummaryWriter(Path(opt.checkpoint_dir)/opt.name)
         except:
             tb_logger = None
             logger.warning('Tensorboard is not available.')
@@ -124,6 +126,7 @@ def evaluate(model, dataset, tokenizer, collator, opt):
     return exactmatch
 
 if __name__ == "__main__":
+    print(datetime.datetime.now())
     options = Options()
     options.add_reader_options()
     options.add_optim_options()
@@ -211,3 +214,4 @@ if __name__ == "__main__":
         best_dev_em,
         checkpoint_path
     )
+    print(datetime.datetime.now())
