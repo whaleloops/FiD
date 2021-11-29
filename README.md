@@ -16,7 +16,7 @@ Performance of the my pretrained and [origianl pretrained models](https://github
 
 <table>
   <tr><td>Mode size</td><td colspan="2">TriviaQA-selftrain10</td><td colspan="2">TriviaQA-original10</td><td colspan="2">TriviaQA-original100</td></tr>
-  <tr><td></td><td>dev</td><td>test</td><td>dev</td><td>test</td></tr><td>dev</td><td>test</td></tr>
+  <tr><td></td><td>dev</td><td>test</td><td>dev</td><td>test</td><td>dev</td><td>test</td></tr>
   <tr><td>base</td><td>abc</td><td>abc</td><td>65.20</td><td>65.52</td><td>67.84</td><td>68.10</td></tr>
 </table>
 
